@@ -54,7 +54,9 @@ export async function generateTypesDir(
   entries.push(await getPathsDeclarationEntry(entrypoints));
 
   // browser.i18n.getMessage
-  entries.push(await getI18nDeclarationEntry());
+  if (await fs.exists(resolve(wxt.config.publicDir, '_locales'))) {
+    entries.push(await getI18nDeclarationEntry());
+  }
 
   // import.meta.env.*
   entries.push(await getGlobalsDeclarationEntry());
@@ -63,7 +65,7 @@ export async function generateTypesDir(
   entries.push(await getTsConfigEntry());
 
   // Let modules add more entries
-  wxt.hooks.callHook('prepare:types', wxt, entries);
+  await wxt.hooks.callHook('prepare:types', wxt, entries);
 
   // Add main declaration file, not editable
   entries.push(getMainDeclarationEntry(entries));
